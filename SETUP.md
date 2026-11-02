@@ -5,12 +5,12 @@ It is a Selenium smoke-test foundation, not an autonomous AI agent.
 
 ## Start from your iPad
 1. On this repository select **Code → Codespaces → Create codespace on main**.
-2. Wait for the Python dependencies and Docker environment to finish installing.
-3. In the Codespaces terminal run:
+2. Wait for Chromium, noVNC, and the Python dependencies to finish installing.
+   The live browser service starts automatically.
+3. If the service does not start automatically, run:
    `bash scripts/start-browser.sh`
 4. Open the **Ports** panel. Forward **7900** if it is not already listed.
    Keep its visibility **Private**, then use **Open in Browser**.
-   Do not forward port 4444 publicly.
 5. The live viewer asks for a password. Read the generated **.env** file in the
    editor and use the SE_VNC_PASSWORD value. Never commit this file.
 6. Return to the terminal and run, replacing the example address:
@@ -33,8 +33,7 @@ If the site's navigation uses buttons instead of links, selectors will need adju
 after inspecting the running prototype.
 
 ## Finish a session
-Run `docker compose down`, then stop the Codespace at https://github.com/codespaces.
-Stopping browser containers alone does not stop Codespaces compute billing.
+Stop the Codespace at https://github.com/codespaces when finished.
 Commit source changes you want to retain; artifacts and secrets are ignored.
 Codespaces has included quotas and may incur charges beyond them.
 
