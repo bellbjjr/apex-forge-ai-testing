@@ -1,0 +1,10 @@
+services:
+  chrome:
+    image: selenium/standalone-chrome:4.51.0-20261010
+    shm_size: 2gb
+    ports:
+      - "127.0.0.1:4444:4444"
+      - "127.0.0.1:7900:7900"
+    environment:
+      SE_VNC_PASSWORD: ${SE_VNC_PASSWORD:?Run bash scripts/start-browser.sh first}
+      SE_NODE_SESSION_TIMEOUT: "600"
