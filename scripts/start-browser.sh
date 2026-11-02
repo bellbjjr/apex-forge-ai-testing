@@ -23,6 +23,7 @@ x11vnc -storepasswd "$password" .vnc/passwd >/dev/null
 export DISPLAY=:99
 nohup Xvfb :99 -screen 0 1440x1000x24 -ac -noreset \
   >.browser-logs/xvfb.log 2>&1 &
+sleep 1
 nohup fluxbox >.browser-logs/fluxbox.log 2>&1 &
 nohup x11vnc -display :99 -forever -shared -rfbauth .vnc/passwd -rfbport 5900 \
   >.browser-logs/x11vnc.log 2>&1 &
