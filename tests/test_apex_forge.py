@@ -1,0 +1,87 @@
+"""First smoke test: verify Apex Forge branding and a usable navigation link."""
+import os
+import re
+import time
+from pathlib import Path
+from urllib.parse import urlparse
+
+import pytest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+
+def test_apex_forge_homepage_and_navigation():
+    target = os.environ.get("BASE_URL", "").strip()
+    parsed = urlparse(target)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        pytest.fail("Set BASE_URL to the Apex Forge website URL before running.")
+    options = webdriver.ChromeOptions()
+    options.add_argument("--window-size=1440,1000")
+    # Visible Chrome: do not add --headless.
+    driver = webdriver.Remote(
+        command_executor=os.environ.get("SELENIUM_URL", "http://localhost:4444"),
+        options=options,
+    )
+    driver.set_page_load_timeout(60)
+    verified_homepage = False
+    artifacts = Path("artifacts")
+    artifacts.mkdir(exist_ok=True)
+    try:
+        driver.get(target)
+        print("If sign-in is required, complete it in the live browser view.")
+        def branded_homepage(browser):
+            same_origin = (
+                urlparse(browser.current_url).scheme,
+                urlparse(browser.current_url).netloc,
+            ) == (parsed.scheme, parsed.netloc)
+            return same_origin and re.search(
+                r"apex\s*forge",
+                browser.find_element(By.TAG_NAME, "body").text,
+                re.IGNORECASE,
+            )
+        WebDriverWait(driver, int(os.environ.get("AUTH_WAIT_SECONDS", "180"))).until(
+            branded_homepage,
+            "Apex Forge content was not reached. Check the URL or finish private-site sign-in.",
+        )
+        verified_homepage = True
+        driver.save_screenshot(str(artifacts / "01-homepage.png"))
+        # Prefer Services; otherwise exercise a visible same-site navigation link.
+        links = driver.find_elements(By.CSS_SELECTOR, "nav a[href], header a[href]")
+        candidates = []
+        for link in links:
+            href = link.get_attribute("href")
+            if not href or not link.is_displayed() or not link.text.strip():
+                continue
+            dest = urlparse(href)
+            if dest.scheme not in ("http", "https") or dest.netloc != parsed.netloc:
+                continue
+            if href.rstrip("/") == driver.current_url.rstrip("/"):
+                continue
+            candidates.append(link)
+        assert candidates, "No visible same-site navigation link was found."
+        candidates.sort(key=lambda link: "services" not in link.text.lower())
+        selected = candidates[0]
+        label = selected.text.strip()
+        expected = selected.get_attribute("href")
+        time.sleep(float(os.environ.get("DEMO_PAUSE_SECONDS", "2")))
+        selected.click()
+        WebDriverWait(driver, 20).until(lambda browser: browser.current_url == expected)
+        fragment = urlparse(expected).fragment
+        if fragment:
+            WebDriverWait(driver, 20).until(
+                lambda browser: browser.find_element(By.ID, fragment).is_displayed()
+            )
+        else:
+            WebDriverWait(driver, 20).until(
+                lambda browser: browser.find_element(By.TAG_NAME, "body").text.strip()
+            )
+        time.sleep(float(os.environ.get("DEMO_PAUSE_SECONDS", "2")))
+        driver.save_screenshot(str(artifacts / "02-navigation.png"))
+        print(f"PASS: Apex Forge loaded and navigation '{label}' reached its destination.")
+    except Exception:
+        # Avoid capturing credentials or a third-party authentication screen.
+        if verified_homepage and urlparse(driver.current_url).netloc == parsed.netloc:
+            driver.save_screenshot(str(artifacts / "failure.png"))
+        raise
+    finally:
+        driver.quit()
