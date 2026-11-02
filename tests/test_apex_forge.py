@@ -17,11 +17,16 @@ def test_apex_forge_homepage_and_navigation():
         pytest.fail("Set BASE_URL to the Apex Forge website URL before running.")
     options = webdriver.ChromeOptions()
     options.add_argument("--window-size=1440,1000")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    if Path("/usr/bin/chromium").exists():
+        options.binary_location = "/usr/bin/chromium"
     # Visible Chrome: do not add --headless.
-    driver = webdriver.Remote(
-        command_executor=os.environ.get("SELENIUM_URL", "http://localhost:4444"),
-        options=options,
-    )
+    selenium_url = os.environ.get("SELENIUM_URL", "").strip()
+    if selenium_url:
+        driver = webdriver.Remote(command_executor=selenium_url, options=options)
+    else:
+        driver = webdriver.Chrome(options=options)
     driver.set_page_load_timeout(60)
     verified_homepage = False
     artifacts = Path("artifacts")
