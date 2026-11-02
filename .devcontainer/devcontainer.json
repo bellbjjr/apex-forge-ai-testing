@@ -1,8 +1,7 @@
 {
   "name": "Apex Forge Selenium",
-  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
-  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  "build": {
+    "dockerfile": "Dockerfile"
   },
   "forwardPorts": [
     7900
@@ -14,7 +13,8 @@
     }
   },
   "postCreateCommand": "python -m pip install -r requirements.txt",
+  "postStartCommand": "bash scripts/start-browser.sh",
   "remoteEnv": {
-    "SELENIUM_URL": "http://localhost:4444"
+    "DISPLAY": ":99"
   }
 }
