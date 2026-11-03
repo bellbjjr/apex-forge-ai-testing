@@ -13,12 +13,13 @@ It is a Selenium smoke-test foundation, not an autonomous AI agent.
    Keep its visibility **Private**, then use **Open in Browser**.
 5. The live viewer asks for a password. Read the generated **.env** file in the
    editor and use the SE_VNC_PASSWORD value. Never commit this file.
-6. Return to the terminal and run, replacing the example address:
-   `BASE_URL='https://your-apex-forge-site.example' python -m pytest -s -v --html=artifacts/report.html --self-contained-html`
+6. Return to the terminal and run:
+   `python -m pytest tests/test_apex_forge.py -s -v --html=artifacts/report.html --self-contained-html`
+   The test automatically starts the bundled Apex Forge testing copy. To test another
+   authorized website, set `BASE_URL` explicitly.
 7. Watch the browser in the other Safari tab or iPad multitasking window.
-   If your prototype requires account sign-in, complete it in the live browser.
-   The script waits up to 180 seconds for Apex Forge content. Change this with
-   AUTH_WAIT_SECONDS if necessary. Do not enter passwords in chat or test code.
+   The bundled testing copy has no ChatGPT sign-in or human-verification gate.
+   Do not enter passwords in chat or test code.
 8. Open **artifacts/report.html** and the PNGs in **artifacts/** to inspect results.
 
 ## What the first test checks

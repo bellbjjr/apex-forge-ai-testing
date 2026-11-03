@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img" aria-label="Apex Forge Incorporated">
+<rect width="900" height="600" fill="#f3efe6"/>
+<path d="M145 430 355 165l112 150 82-98 206 213H145Z" fill="#082545"/>
+<path d="m355 165 112 150 82-98 80 83-94-35-67 80-115-153-77 97Z" fill="#c7993a"/>
+<path d="M190 446h520" stroke="#c7993a" stroke-width="12"/>
+<text x="450" y="505" text-anchor="middle" font-family="Arial,sans-serif" font-size="64" font-weight="700" fill="#082545">APEX FORGE</text>
+<text x="450" y="550" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" letter-spacing="8" fill="#52606d">INCORPORATED</text>
+</svg>

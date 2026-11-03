@@ -1,6 +1,9 @@
 """First smoke test: verify Apex Forge branding and a usable navigation link."""
 import os
 import re
+import socket
+import subprocess
+import sys
 import time
 from pathlib import Path
 from urllib.parse import urlparse
@@ -12,6 +15,35 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 def test_apex_forge_homepage_and_navigation():
     target = os.environ.get("BASE_URL", "").strip()
+    local_server = None
+    if not target:
+        site_directory = Path("site-under-test")
+        if not (site_directory / "index.html").exists():
+            pytest.fail("site-under-test/index.html is missing. Pull the latest repository changes.")
+        local_server = subprocess.Popen(
+            [
+                sys.executable,
+                "-m",
+                "http.server",
+                "4173",
+                "--bind",
+                "127.0.0.1",
+                "--directory",
+                str(site_directory),
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        for _ in range(50):
+            try:
+                with socket.create_connection(("127.0.0.1", 4173), timeout=0.2):
+                    break
+            except OSError:
+                time.sleep(0.1)
+        else:
+            local_server.terminate()
+            pytest.fail("The local Apex Forge test server did not start.")
+        target = "http://127.0.0.1:4173/index.html"
     parsed = urlparse(target)
     if parsed.scheme not in ("http", "https") or not parsed.netloc:
         pytest.fail("Set BASE_URL to the Apex Forge website URL before running.")
@@ -90,3 +122,9 @@ def test_apex_forge_homepage_and_navigation():
         raise
     finally:
         driver.quit()
+        if local_server is not None:
+            local_server.terminate()
+            try:
+                local_server.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                local_server.kill()
