@@ -22,6 +22,15 @@ It is a Selenium smoke-test foundation, not an autonomous AI agent.
    Do not enter passwords in chat or test code.
 8. Open **artifacts/report.html** and the PNGs in **artifacts/** to inspect results.
 
+## Watch the full navigation and scrolling tour
+Run this test while the noVNC viewer is open:
+`python -m pytest tests/test_visible_tour.py -s -v`
+
+The tour visits Home, Services, Our Approach, About, Insights, and Shop. It
+scrolls through each page, returns to the top, and continues to the next tab.
+Slow it down by adding, for example, `TOUR_PAUSE_SECONDS=1.5` before the command.
+Screenshots are saved in `artifacts/visible-tour/`.
+
 ## What the first test checks
 - The requested site loads and displays Apex Forge branding.
 - A visible same-site navigation link exists (Services is preferred).
